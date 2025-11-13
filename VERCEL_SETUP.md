@@ -7,13 +7,20 @@ This guide explains how to connect your Vercel frontend to the Render backend.
 - **Backend (Render)**: Full Next.js app with API routes at `https://demand-letter-szag.onrender.com`
 - **Frontend (Vercel)**: Next.js frontend that calls the Render backend API
 
+## Quick Setup
+
+Run the setup script to see required environment variables:
+```bash
+./scripts/setup-vercel-env.sh
+```
+
 ## Step 1: Deploy to Vercel
 
 1. Go to https://vercel.com and sign in
 2. Click "Add New" → "Project"
 3. Import your GitHub repository: `alexander-t-ho/Demand-Letter`
 4. Configure the project:
-   - **Framework Preset**: Next.js
+   - **Framework Preset**: Next.js (auto-detected)
    - **Root Directory**: `./` (or leave empty)
    - **Build Command**: `npm ci --include=dev && npx prisma generate && npx next build`
    - **Output Directory**: `.next` (default)
@@ -23,78 +30,63 @@ This guide explains how to connect your Vercel frontend to the Render backend.
 
 In your Vercel project settings, go to **Settings** → **Environment Variables** and add:
 
-### Required Variables:
+### Required Variable:
 
 ```bash
-# Backend API URL (Render backend)
 NEXT_PUBLIC_API_URL=https://demand-letter-szag.onrender.com
-
-# Note: These are only needed if you want to use server-side features
-# For a pure frontend deployment, you only need NEXT_PUBLIC_API_URL
 ```
 
-### Optional (if using server-side features):
+This tells the Vercel frontend where to find the Render backend API.
 
-```bash
-# Database (if needed for server-side rendering)
-DATABASE_URL=postgresql://... (External Database URL from Render)
+## Step 3: Update Render Backend CORS Settings
 
-# Authentication
-JWT_SECRET=your-jwt-secret
+After deploying to Vercel, update the Render backend to allow your Vercel domain:
 
-# AWS S3
-AWS_ACCESS_KEY_ID=your-aws-access-key
-AWS_SECRET_ACCESS_KEY=your-aws-secret-key
-AWS_REGION=us-east-1
-AWS_S3_BUCKET=alexho-demand-letters
+1. Go to Render dashboard: https://dashboard.render.com/web/srv-d4ap9b3e5dus73f2v600
+2. Go to **Environment** tab
+3. Add/Update: `NEXT_PUBLIC_FRONTEND_URL` = `https://your-vercel-app.vercel.app`
+4. This allows CORS to work properly
 
-# OpenRouter AI
-OPENROUTER_API_KEY=your-openrouter-api-key
-OPENROUTER_DEFAULT_MODEL=anthropic/claude-3.5-sonnet
-```
+## Step 4: Deploy
 
-## Step 3: Update Code to Use API Client
-
-The codebase has been updated to use `apiFetch` utility which automatically handles:
-- Same-origin requests (when frontend and backend are together)
-- Cross-origin requests (when frontend is on Vercel and backend is on Render)
-
-## Step 4: Configure CORS on Render Backend
-
-The Render backend needs to allow requests from your Vercel domain. Update your Next.js API routes or add CORS middleware.
-
-## Step 5: Deploy
-
-1. Push your code to GitHub
+1. Push your code to GitHub (already done)
 2. Vercel will automatically deploy
 3. Your frontend will be available at `https://your-project.vercel.app`
+
+## How It Works
+
+- **CORS Middleware**: Automatically added to all `/api/*` routes on Render backend
+- **API Client**: Frontend uses `NEXT_PUBLIC_API_URL` to call Render backend
+- **Authentication**: Cookies work across domains with proper CORS configuration
 
 ## Testing
 
 1. Visit your Vercel deployment URL
 2. Try logging in - it should call the Render backend
 3. Check browser console for any CORS errors
-4. If you see CORS errors, you'll need to add CORS headers to your Render backend API routes
+4. Verify API calls are going to Render backend in Network tab
 
 ## Troubleshooting
 
 ### CORS Errors
 
-If you see CORS errors, add CORS headers to your API routes. You can create a middleware or update each route to include:
-
-```typescript
-headers: {
-  'Access-Control-Allow-Origin': process.env.NEXT_PUBLIC_FRONTEND_URL || '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Access-Control-Allow-Credentials': 'true',
-}
-```
+The middleware should handle CORS automatically. If you still see errors:
+1. Verify `NEXT_PUBLIC_FRONTEND_URL` is set in Render with your Vercel URL
+2. Check that the middleware is deployed (it's in `middleware.ts`)
+3. Ensure `credentials: 'include'` is in fetch calls (already added)
 
 ### Authentication Issues
 
-Since cookies are used for authentication, ensure:
-- `credentials: 'include'` is set in fetch calls (already done in `apiFetch`)
-- CORS allows credentials
-- Cookie domain is set correctly
+- Cookies work across domains with `Access-Control-Allow-Credentials: true` (already configured)
+- Ensure `credentials: 'include'` is in all fetch calls
+- Check that JWT_SECRET matches between environments if using server-side auth
 
+## Architecture
+
+```
+Vercel Frontend (https://your-app.vercel.app)
+    ↓ (API calls via NEXT_PUBLIC_API_URL)
+Render Backend (https://demand-letter-szag.onrender.com)
+    ↓ (Database queries)
+Render PostgreSQL Database
+```
