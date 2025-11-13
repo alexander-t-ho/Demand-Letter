@@ -1,16 +1,29 @@
-import { PrismaClient } from '@prisma/client'
-
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
+// Conditional import to handle cases where Prisma is not generated (e.g., Vercel frontend-only builds)
+let PrismaClient: any
+try {
+  PrismaClient = require('@prisma/client').PrismaClient
+} catch (error) {
+  // Prisma not available (e.g., in frontend-only builds)
+  PrismaClient = null
 }
 
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-  })
+const globalForPrisma = globalThis as unknown as {
+  prisma: any | undefined
+}
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+// Only initialize Prisma on server-side when available
+// In frontend builds or when Prisma is not generated, this will be null
+export const prisma =
+  typeof window === 'undefined' && PrismaClient
+    ? globalForPrisma.prisma ??
+      new PrismaClient({
+        log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+      })
+    : (null as any)
+
+if (typeof window === 'undefined' && process.env.NODE_ENV !== 'production' && prisma) {
+  globalForPrisma.prisma = prisma
+}
 
 export default prisma
 

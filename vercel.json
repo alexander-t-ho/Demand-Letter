@@ -1,11 +1,8 @@
 {
-  "buildCommand": "npm ci --include=dev && npx prisma generate && npx next build",
+  "buildCommand": "npm install && DATABASE_URL='postgresql://dummy:dummy@localhost:5432/dummy' npx prisma generate && npm run build",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "regions": ["iad1"],
-  "env": {
-    "NEXT_PUBLIC_API_URL": "@render-backend-url"
-  }
+  "regions": ["iad1"]
 }
 

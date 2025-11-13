@@ -1,4 +1,5 @@
 // Import Prisma types for use in extended types
+// Note: Prisma must be generated before build (even for frontend-only builds)
 import type {
   User,
   Template,
