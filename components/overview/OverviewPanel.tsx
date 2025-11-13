@@ -11,15 +11,10 @@ import SupportingDocuments from './SupportingDocuments'
 import AdvancedSettings from './AdvancedSettings'
 import SectionInstructions from './SectionInstructions'
 import LogoUpload from './LogoUpload'
+import { AvailableData } from '@/lib/types/common'
 
 interface OverviewPanelProps {
   documentId: string
-}
-
-interface AvailableData {
-  providers: any[]
-  transcriptions: any[]
-  expertReports: any[]
 }
 
 export default function OverviewPanel({ documentId }: OverviewPanelProps) {
@@ -68,7 +63,7 @@ export default function OverviewPanel({ documentId }: OverviewPanelProps) {
           setDocumentSections(doc.template.sections)
         } else if (doc.sections && doc.sections.length > 0) {
           // Fallback to document sections if template sections not available
-          setDocumentSections(doc.sections.map((s: any) => s.sectionType))
+          setDocumentSections(doc.sections.map((s: { sectionType: string }) => s.sectionType))
         }
       }
 
@@ -83,7 +78,7 @@ export default function OverviewPanel({ documentId }: OverviewPanelProps) {
     }
   }
 
-  const updateMetadata = async (updates: any) => {
+  const updateMetadata = async (updates: Record<string, unknown>) => {
     const response = await fetch(`/api/documents/${documentId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -155,7 +150,7 @@ export default function OverviewPanel({ documentId }: OverviewPanelProps) {
     await loadData() // Reload to update counts
   }
 
-  const handleAdvancedSettingsSave = async (settings: any) => {
+  const handleAdvancedSettingsSave = async (settings: Record<string, unknown>) => {
     await updateMetadata({ ...settings })
   }
 

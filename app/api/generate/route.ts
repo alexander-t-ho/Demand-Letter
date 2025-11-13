@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateSection } from '@/lib/ai/generator'
 import { z } from 'zod'
+import { handleApiError, parseRequestBody } from '@/lib/utils/api'
 
 const generateRequestSchema = z.object({
   documentId: z.string(),
   sectionType: z.string(),
   context: z.object({
-    caseInfo: z.any().optional(),
+    caseInfo: z.any().optional(), // Keep as any for flexibility with metadata
     selectedProviders: z.array(z.string()).optional(),
     sourceDocuments: z.array(z.string()).optional(),
-    styleMetadata: z.any().optional(),
-    toneMetadata: z.any().optional(),
+    styleMetadata: z.any().optional(), // Keep as any for flexibility with metadata
+    toneMetadata: z.any().optional(), // Keep as any for flexibility with metadata
     copyStyle: z.boolean().optional(),
     matchTone: z.boolean().optional(),
     customPrompt: z.string().optional(),
@@ -22,11 +23,14 @@ const generateRequestSchema = z.object({
 
 // POST /api/generate
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json()
-    const validated = generateRequestSchema.parse(body)
+  const parseResult = await parseRequestBody(request, generateRequestSchema)
+  
+  if (!parseResult.success) {
+    return parseResult.response
+  }
 
-    const result = await generateSection(validated)
+  try {
+    const result = await generateSection(parseResult.data)
 
     if (!result.success) {
       return NextResponse.json(result, { status: 400 })
@@ -34,21 +38,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result)
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { success: false, error: error.errors },
-        { status: 400 }
-      )
-    }
-
-    console.error('Error in generate endpoint:', error)
-    return NextResponse.json(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
-    )
+    return handleApiError(error)
   }
 }
 

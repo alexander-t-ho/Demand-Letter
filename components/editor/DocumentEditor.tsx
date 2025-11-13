@@ -9,26 +9,14 @@ import VersionHistory from './VersionHistory'
 import AnalysisPointsPanel from './AnalysisPointsPanel'
 import { Save, FileText, Settings, ChevronDown, ChevronUp, Upload, History, ArrowLeft } from 'lucide-react'
 import CircularProgress from '@/components/ui/CircularProgress'
-
-interface Document {
-  id: string
-  filename: string
-  status: string
-  templateId: string | null
-  template?: {
-    id: string
-    name: string
-    sections?: string[]
-  } | null
-  metadata: any
-  sections: Array<{
-    id: string
-    sectionType: string
-    content: string
-    order: number
-    isGenerated: boolean
-  }>
-}
+import { 
+  DocumentWithSections, 
+  CaseInfo, 
+  DEFAULT_SECTION_TYPES,
+  SECTION_LABELS 
+} from '@/lib/types/common'
+import { getSectionLabel, detectSectionFromInstructions } from '@/lib/utils/sections'
+import { SectionType } from '@/lib/ai/types'
 
 interface DocumentEditorProps {
   documentId: string
@@ -36,12 +24,12 @@ interface DocumentEditorProps {
 
 export default function DocumentEditor({ documentId }: DocumentEditorProps) {
   const router = useRouter()
-  const [document, setDocument] = useState<Document | null>(null)
+  const [document, setDocument] = useState<DocumentWithSections | null>(null)
   const [loading, setLoading] = useState(true)
   const [generatingSection, setGeneratingSection] = useState<string | null>(null)
   const [generatingAll, setGeneratingAll] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [caseInfo, setCaseInfo] = useState<any>({})
+  const [caseInfo, setCaseInfo] = useState<CaseInfo>({})
   const [customPrompt, setCustomPrompt] = useState('')
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [enablePageCount, setEnablePageCount] = useState(false)
@@ -63,9 +51,9 @@ export default function DocumentEditor({ documentId }: DocumentEditorProps) {
   useEffect(() => {
     if (document && !caseInfo.dateOfLetter) {
       const today = new Date().toISOString().split('T')[0]
-      setCaseInfo((prev: any) => ({ ...prev, dateOfLetter: today }))
+      setCaseInfo((prev) => ({ ...prev, dateOfLetter: today }))
     }
-  }, [document])
+  }, [document, caseInfo.dateOfLetter])
 
   const loadDocument = async () => {
     try {
@@ -151,56 +139,6 @@ export default function DocumentEditor({ documentId }: DocumentEditorProps) {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [document, caseInfo, customPrompt])
 
-  const sectionLabels: Record<string, string> = {
-    introduction: 'Introduction',
-    statement_of_facts: 'Statement of Facts',
-    liability: 'Liability',
-    damages: 'Damages',
-    medical_chronology: 'Medical/Injury Chronology',
-    economic_damages: 'Economic Damages',
-    treatment_reasonableness: 'Reasonableness and Necessity of Treatment',
-    conclusion: 'Conclusion',
-    coverage_analysis: 'Coverage Analysis',
-    policy_limits: 'Policy Limits',
-    negligence_analysis: 'Negligence Analysis',
-    comparative_fault: 'Comparative Fault',
-  }
-
-  // Detect which section is mentioned in custom instructions
-  const detectSectionFromInstructions = (instructions: string): string | null => {
-    const sectionKeywords: Record<string, string[]> = {
-      introduction: ['introduction', 'intro', 'opening', 'opening paragraph'],
-      statement_of_facts: ['statement of facts', 'facts', 'factual', 'incident', 'what happened'],
-      liability: ['liability', 'negligence', 'fault', 'responsible', 'responsibility', 'at fault'],
-      damages: ['damages', 'damage', 'injuries', 'losses', 'harm'],
-      medical_chronology: ['medical', 'treatment', 'chronology', 'medical history', 'medical treatment', 'injury chronology'],
-      economic_damages: ['economic', 'financial', 'wages', 'income', 'lost wages', 'economic loss'],
-      treatment_reasonableness: ['treatment', 'reasonable', 'necessity', 'medical necessity', 'reasonableness'],
-      conclusion: ['conclusion', 'closing', 'summary', 'final', 'closing paragraph'],
-      coverage_analysis: ['coverage', 'insurance coverage', 'policy coverage'],
-      policy_limits: ['policy limits', 'limits', 'policy limit'],
-      negligence_analysis: ['negligence', 'negligent', 'negligence analysis'],
-      comparative_fault: ['comparative fault', 'comparative', 'fault'],
-    }
-
-    const lowerInstructions = instructions.toLowerCase()
-    
-    // Check for exact section type matches first (e.g., "introduction", "liability")
-    for (const sectionType of Object.keys(sectionKeywords)) {
-      if (lowerInstructions.includes(sectionType.replace(/_/g, ' '))) {
-        return sectionType
-      }
-    }
-    
-    // Then check for keywords
-    for (const [sectionType, keywords] of Object.entries(sectionKeywords)) {
-      if (keywords.some(keyword => lowerInstructions.includes(keyword))) {
-        return sectionType
-      }
-    }
-    
-    return null
-  }
 
   const handleGenerate = async (sectionId: string, sectionType: string) => {
     // Create version snapshot BEFORE generation (for undo)
@@ -223,7 +161,7 @@ export default function DocumentEditor({ documentId }: DocumentEditorProps) {
     }
 
     setGeneratingSection(sectionId)
-    const sectionName = sectionLabels[sectionType] || sectionType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+    const sectionName = getSectionLabel(sectionType)
     
     // Simulate progress for single section generation
     setGenerationProgress({ percentage: 0, currentSection: `Generating ${sectionName}...` })
@@ -272,17 +210,7 @@ export default function DocumentEditor({ documentId }: DocumentEditorProps) {
             }),
           })
         } else {
-          const defaultSectionTypes = [
-            'introduction',
-            'statement_of_facts',
-            'liability',
-            'damages',
-            'medical_chronology',
-            'economic_damages',
-            'treatment_reasonableness',
-            'conclusion',
-          ]
-          const templateSectionTypes: string[] = document?.template?.sections || defaultSectionTypes
+          const templateSectionTypes: string[] = document?.template?.sections || DEFAULT_SECTION_TYPES
           const order = templateSectionTypes.indexOf(sectionType)
           const finalOrder = order >= 0 ? order : (document?.sections.length || 0)
           
@@ -321,17 +249,7 @@ export default function DocumentEditor({ documentId }: DocumentEditorProps) {
     
     setGeneratingAll(true)
     try {
-      const defaultSectionTypes = [
-        'introduction',
-        'statement_of_facts',
-        'liability',
-        'damages',
-        'medical_chronology',
-        'economic_damages',
-        'treatment_reasonableness',
-        'conclusion',
-      ]
-      const templateSectionTypes: string[] = document.template?.sections || defaultSectionTypes
+      const templateSectionTypes: string[] = document.template?.sections || DEFAULT_SECTION_TYPES
       const context = buildGenerationContext()
 
       // Always generate all sections (regenerate everything)
@@ -341,7 +259,7 @@ export default function DocumentEditor({ documentId }: DocumentEditorProps) {
       // Generate all sections sequentially with progress tracking
       for (let i = 0; i < sectionsToGenerate.length; i++) {
         const sectionType = sectionsToGenerate[i]
-        const sectionName = sectionLabels[sectionType] || sectionType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+        const sectionName = getSectionLabel(sectionType)
         const percentage = Math.round((i / totalSections) * 100)
         
         setGenerationProgress({
@@ -452,7 +370,7 @@ export default function DocumentEditor({ documentId }: DocumentEditorProps) {
     // Find the section
     const section = document?.sections.find(s => s.sectionType === detectedSection)
     if (!section) {
-      alert(`Section "${sectionLabels[detectedSection] || detectedSection}" not found in this document`)
+      alert(`Section "${getSectionLabel(detectedSection)}" not found in this document`)
       return
     }
 
@@ -616,19 +534,7 @@ export default function DocumentEditor({ documentId }: DocumentEditorProps) {
   }
 
   const existingSections = (document.sections || []).sort((a, b) => a.order - b.order)
-  
-  const defaultSectionTypes = [
-    'introduction',
-    'statement_of_facts',
-    'liability',
-    'damages',
-    'medical_chronology',
-    'economic_damages',
-    'treatment_reasonableness',
-    'conclusion',
-  ]
-  
-  const templateSectionTypes: string[] = document.template?.sections || defaultSectionTypes
+  const templateSectionTypes: string[] = document.template?.sections || DEFAULT_SECTION_TYPES
   const sectionsByType = new Map(existingSections.map(s => [s.sectionType, s]))
   
   const allSections = templateSectionTypes.length > 0
@@ -922,7 +828,7 @@ export default function DocumentEditor({ documentId }: DocumentEditorProps) {
                   <input
                     type="date"
                     value={caseInfo.dateOfLetter || new Date().toISOString().split('T')[0]}
-                    onChange={(e) => setCaseInfo((prev: any) => ({ ...prev, dateOfLetter: e.target.value }))}
+                    onChange={(e) => setCaseInfo((prev) => ({ ...prev, dateOfLetter: e.target.value }))}
                     className="w-full px-3 py-2 bg-gray-800 text-white border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-forest-500 text-sm"
                   />
                   <p className="text-xs text-gray-400 mt-1">

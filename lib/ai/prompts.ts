@@ -1,4 +1,5 @@
 import type { GenerationContext, SectionType } from './types'
+import { CaseInfo, StyleMetadata, ToneMetadata } from '@/lib/types/common'
 
 /**
  * Build prompt for a specific section type
@@ -97,7 +98,7 @@ export function buildPrompt(
 /**
  * Get base prompt for section type
  */
-function getBasePrompt(sectionType: SectionType, caseInfo: any): string {
+function getBasePrompt(sectionType: SectionType, caseInfo: CaseInfo): string {
   const caseDetails = formatCaseInfo(caseInfo)
   
   switch (sectionType) {
@@ -435,7 +436,7 @@ Generate the ${sectionType} section now:`
 /**
  * Format case information for prompt
  */
-function formatCaseInfo(caseInfo: any): string {
+function formatCaseInfo(caseInfo: CaseInfo): string {
   const parts: string[] = []
   
   if (caseInfo.claimNumber) {
@@ -474,7 +475,7 @@ function formatCaseInfo(caseInfo: any): string {
 /**
  * Format style instructions for prompt
  */
-function formatStyleInstructions(styleMetadata: any): string {
+function formatStyleInstructions(styleMetadata: StyleMetadata): string {
   const instructions: string[] = []
   
   if (styleMetadata.fonts) {
@@ -515,7 +516,7 @@ function formatStyleInstructions(styleMetadata: any): string {
 /**
  * Format tone instructions for prompt
  */
-function formatToneInstructions(toneMetadata: any): string {
+function formatToneInstructions(toneMetadata: ToneMetadata): string {
   const instructions: string[] = []
   
   if (toneMetadata.formality) {

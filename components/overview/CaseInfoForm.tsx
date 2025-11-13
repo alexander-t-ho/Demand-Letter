@@ -1,16 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { CaseInfo } from '@/lib/types/common'
 
-export interface CaseInfo {
-  claimNumber?: string
-  insured?: string
-  dateOfLoss?: string
-  client?: string
-  adjuster?: string
-  dateOfLetter?: string
-  target?: string
-}
+export type { CaseInfo }
 
 interface CaseInfoFormProps {
   initialData?: CaseInfo

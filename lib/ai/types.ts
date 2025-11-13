@@ -1,17 +1,11 @@
+import { CaseInfo, StyleMetadata, ToneMetadata } from '@/lib/types/common'
+
 export interface GenerationContext {
-  caseInfo?: {
-    claimNumber?: string
-    insured?: string
-    dateOfLoss?: string
-    client?: string
-    adjuster?: string
-    dateOfLetter?: string
-    target?: string
-  }
+  caseInfo?: CaseInfo
   selectedProviders?: string[]
   sourceDocuments?: string[]
-  styleMetadata?: any
-  toneMetadata?: any
+  styleMetadata?: StyleMetadata
+  toneMetadata?: ToneMetadata
   copyStyle?: boolean
   matchTone?: boolean
   customPrompt?: string
