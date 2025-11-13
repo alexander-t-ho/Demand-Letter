@@ -13,7 +13,7 @@ echo ""
 
 # Database URL (Internal - for Render services)
 echo "# Database (use Internal Database URL from Render PostgreSQL dashboard)"
-echo "DATABASE_URL=postgresql://steno_demand_letter_user:rfbWXsPp38jxhHU7mZhRNZsAqbjUZH5L@dpg-d4alibhr0fns73ecreu0-a.oregon-postgres.render.com/steno_demand_letter"
+echo "DATABASE_URL=postgresql://user:password@host:5432/database_name"
 echo ""
 
 # Read from .env if it exists
