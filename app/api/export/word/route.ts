@@ -33,8 +33,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Get case info from metadata
-    const caseInfo = document.metadata?.caseInfo || {}
-    const styleMetadata = document.metadata?.styleMetadata || document.template?.styleMetadata
+    const metadata = document.metadata as { caseInfo?: any; styleMetadata?: any } | null
+    const caseInfo = metadata?.caseInfo || {}
+    const styleMetadata = metadata?.styleMetadata || document.template?.styleMetadata
 
     // Get user logo
     const userRecord = await prisma.user.findUnique({
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
     const safeFilename = filename.replace(/[^a-zA-Z0-9-_]/g, '_')
 
     // Return file
-    return new NextResponse(buffer, {
+    return new NextResponse(buffer as any, {
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'Content-Disposition': `attachment; filename="${safeFilename}.docx"`,

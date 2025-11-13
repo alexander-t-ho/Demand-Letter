@@ -32,8 +32,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Get case info from metadata
-    const caseInfo = document.metadata?.caseInfo || {}
-    const styleMetadata = document.metadata?.styleMetadata || document.template?.styleMetadata
+    const metadata = document.metadata as { caseInfo?: any; styleMetadata?: any } | null
+    const caseInfo = metadata?.caseInfo || {}
+    const styleMetadata = metadata?.styleMetadata || document.template?.styleMetadata
 
     // Get user logo
     const userRecord = await prisma.user.findUnique({
@@ -91,7 +92,14 @@ export async function POST(request: NextRequest) {
         const { pdf } = await import('@react-pdf/renderer')
         const pdfInstance = pdf(pdfDoc)
         if (typeof pdfInstance.toBuffer === 'function') {
-          buffer = await pdfInstance.toBuffer()
+          // toBuffer() may return a Buffer or ReadableStream depending on environment
+          const result = await pdfInstance.toBuffer()
+          if (Buffer.isBuffer(result)) {
+            buffer = result
+          } else {
+            // If it's a stream, convert to buffer (fallback path)
+            buffer = Buffer.from(await (result as any).arrayBuffer?.() || [])
+          }
         } else {
           throw new Error('renderToBuffer failed and toBuffer is not available')
         }
@@ -106,7 +114,7 @@ export async function POST(request: NextRequest) {
     const safeFilename = filename.replace(/[^a-zA-Z0-9-_]/g, '_')
 
     // Return file
-    return new NextResponse(buffer, {
+    return new NextResponse(buffer as any, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${safeFilename}.pdf"`,

@@ -135,8 +135,8 @@ export async function generateSection(
     const enhancedContext = {
       ...request.context,
       caseInfo,
-      styleMetadata,
-      toneMetadata,
+      styleMetadata: (styleMetadata as any) || undefined,
+      toneMetadata: (toneMetadata as any) || undefined,
     }
 
     // Build final prompt if not custom
@@ -241,8 +241,8 @@ export async function* generateSectionStream(
     const enhancedContext = {
       ...request.context,
       caseInfo,
-      styleMetadata,
-      toneMetadata,
+      styleMetadata: (styleMetadata as any) || undefined,
+      toneMetadata: (toneMetadata as any) || undefined,
     }
 
     // Build final prompt if not custom

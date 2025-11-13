@@ -229,7 +229,7 @@ async function parsePDFWithOCR(
       worker = null
 
       const cleanedText = text.trim()
-      const wordCount = words?.length || cleanedText.split(/\s+/).filter(word => word.length > 0).length
+      const wordCount = words?.length || cleanedText.split(/\s+/).filter((word: string) => word.length > 0).length
 
       console.log('OCR completed:', {
         textLength: cleanedText.length,

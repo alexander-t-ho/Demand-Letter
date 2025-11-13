@@ -43,8 +43,8 @@ export async function parseDocument(
         filename,
         fileType: 'pdf',
         wordCount: result.metadata.wordCount,
-        pageCount: result.metadata.pageCount,
-        isOCR: result.metadata.isOCR,
+        pageCount: (result.metadata as any).pageCount,
+        isOCR: (result.metadata as any).isOCR,
       },
     }
   } else if (fileType === 'docx') {

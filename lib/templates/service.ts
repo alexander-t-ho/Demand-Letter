@@ -38,8 +38,8 @@ export class TemplateService {
       data: {
         name: data.name,
         content: data.content ?? null,
-        styleMetadata: data.styleMetadata ?? null,
-        toneMetadata: data.toneMetadata ?? null,
+        styleMetadata: (data.styleMetadata ?? null) as any,
+        toneMetadata: (data.toneMetadata ?? null) as any,
         isDefault: false,
       },
     })
@@ -54,8 +54,8 @@ export class TemplateService {
       data: {
         ...(data.name && { name: data.name }),
         ...(data.content !== undefined && { content: data.content }),
-        ...(data.styleMetadata !== undefined && { styleMetadata: data.styleMetadata }),
-        ...(data.toneMetadata !== undefined && { toneMetadata: data.toneMetadata }),
+        ...(data.styleMetadata !== undefined && { styleMetadata: data.styleMetadata as any }),
+        ...(data.toneMetadata !== undefined && { toneMetadata: data.toneMetadata as any }),
       },
     })
   }

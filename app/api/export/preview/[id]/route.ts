@@ -24,7 +24,8 @@ export async function GET(
     }
 
     // Get case info
-    const caseInfo = document.metadata?.caseInfo || {}
+    const metadata = document.metadata as { caseInfo?: any } | null
+    const caseInfo = metadata?.caseInfo || {}
     const sections = document.sections.sort((a, b) => a.order - b.order)
 
     // Generate HTML preview
@@ -126,8 +127,8 @@ function generateHTMLPreview(sections: any[], caseInfo: any): string {
     const label = sectionLabels[section.sectionType] || section.sectionType.toUpperCase().replace(/_/g, ' ')
     html += `<div class="section-heading">${label}</div>`
 
-    const paragraphs = section.content.split('\n\n').filter((p) => p.trim())
-    paragraphs.forEach((para) => {
+    const paragraphs = section.content.split('\n\n').filter((p: string) => p.trim())
+    paragraphs.forEach((para: string) => {
       const escaped = para
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')

@@ -1,3 +1,15 @@
+// Import Prisma types for use in extended types
+import type {
+  User,
+  Template,
+  Document,
+  DocumentSection,
+  SourceDocument,
+  MedicalProvider,
+  GenerationHistory,
+  Transcription,
+} from '@prisma/client'
+
 // Re-export Prisma types for convenience
 export type {
   User,
@@ -8,7 +20,7 @@ export type {
   MedicalProvider,
   GenerationHistory,
   Transcription,
-} from '@prisma/client'
+}
 
 // Extended types with relations
 export type DocumentWithRelations = Document & {

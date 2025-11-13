@@ -227,7 +227,7 @@ export function generatePDFDocument(
                 const isItalic = para.includes('*') && !isBold
 
                 return (
-                  <Text key={idx} style={[styles.paragraph, isBold && styles.bold, isItalic && styles.italic]}>
+                  <Text key={idx} style={[styles.paragraph, isBold && styles.bold, isItalic && styles.italic] as any}>
                     {para.replace(/\*\*/g, '').replace(/\*/g, '')}
                   </Text>
                 )

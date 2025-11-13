@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
               ...(document.metadata as object || {}),
               ...(styleMetadata && { styleMetadata }),
               ...(toneMetadata && { toneMetadata }),
-            },
+            } as any,
           },
         })
       }

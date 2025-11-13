@@ -13,10 +13,10 @@ import {
   DocumentWithSections, 
   CaseInfo, 
   DEFAULT_SECTION_TYPES,
-  SECTION_LABELS 
+  SECTION_LABELS,
+  SectionType
 } from '@/lib/types/common'
 import { getSectionLabel, detectSectionFromInstructions } from '@/lib/utils/sections'
-import { SectionType } from '@/lib/ai/types'
 
 interface DocumentEditorProps {
   documentId: string

@@ -1,4 +1,28 @@
-import { SectionType } from '@/lib/ai/types'
+// Section type definition
+export type SectionType =
+  | 'introduction'
+  | 'statement_of_facts'
+  | 'liability'
+  | 'damages'
+  | 'medical_chronology'
+  | 'economic_damages'
+  | 'treatment_reasonableness'
+  | 'conclusion'
+  | 'coverage_analysis'
+  | 'policy_limits'
+  | 'negligence_analysis'
+  | 'comparative_fault'
+  | 'violations'
+  | 'remedies'
+  | 'statutory_damages'
+  | 'contract_terms'
+  | 'breach_analysis'
+  | 'business_context'
+  | 'business_impact'
+  | 'legal_basis'
+  | 'circumstances'
+  | 'best_interests'
+  | 'estate_context'
 
 // Common document interfaces
 export interface CaseInfo {

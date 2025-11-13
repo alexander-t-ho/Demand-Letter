@@ -239,14 +239,14 @@ export default function OverviewPanel({ documentId }: OverviewPanelProps) {
       <MedicalProviderModal
         open={medicalModalOpen}
         onClose={() => setMedicalModalOpen(false)}
-        providers={availableData.providers}
+        providers={availableData.providers as any}
         onUpdate={handleProviderUpdate}
       />
 
       <TranscriptionSelector
         open={transcriptionModalOpen}
         onClose={() => setTranscriptionModalOpen(false)}
-        transcriptions={availableData.transcriptions}
+        transcriptions={availableData.transcriptions as any}
         selectedIds={selectedTranscriptions}
         onUpdate={handleTranscriptionUpdate}
       />

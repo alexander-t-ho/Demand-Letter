@@ -1,4 +1,7 @@
-import { CaseInfo, StyleMetadata, ToneMetadata } from '@/lib/types/common'
+import { CaseInfo, StyleMetadata, ToneMetadata, SectionType } from '@/lib/types/common'
+
+// Re-export SectionType for backward compatibility
+export type { SectionType }
 
 export interface GenerationContext {
   caseInfo?: CaseInfo
@@ -41,29 +44,4 @@ export interface StreamChunk {
   responseTime?: number
   error?: string
 }
-
-export type SectionType =
-  | 'introduction'
-  | 'statement_of_facts'
-  | 'liability'
-  | 'damages'
-  | 'medical_chronology'
-  | 'economic_damages'
-  | 'treatment_reasonableness'
-  | 'conclusion'
-  | 'coverage_analysis'
-  | 'policy_limits'
-  | 'negligence_analysis'
-  | 'comparative_fault'
-  | 'violations'
-  | 'remedies'
-  | 'statutory_damages'
-  | 'contract_terms'
-  | 'breach_analysis'
-  | 'business_context'
-  | 'business_impact'
-  | 'legal_basis'
-  | 'circumstances'
-  | 'best_interests'
-  | 'estate_context'
 

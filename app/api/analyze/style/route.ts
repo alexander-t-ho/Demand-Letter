@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
             metadata: {
               ...(document.metadata as object || {}),
               styleMetadata,
-            },
+            } as any,
           },
         })
       }
