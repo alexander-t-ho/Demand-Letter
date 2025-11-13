@@ -42,7 +42,7 @@ AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
 AWS_REGION=us-east-1
 AWS_S3_BUCKET=alexho-demand-letters
 
-# OpenRouter AI
+# OpenRouter AI (replace with your actual API key)
 OPENROUTER_API_KEY=your-openrouter-api-key
 OPENROUTER_DEFAULT_MODEL=anthropic/claude-3.5-sonnet
 
