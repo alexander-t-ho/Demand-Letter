@@ -81,6 +81,11 @@ export function buildPrompt(
     basePrompt += `\n\nNote: This section should reference the selected medical providers and their treatments.`
   }
   
+  // Add page count target if specified
+  if (context.targetPageCount) {
+    basePrompt += `\n\nIMPORTANT: The entire demand letter should be approximately ${context.targetPageCount} ${context.targetPageCount === 1 ? 'page' : 'pages'} long. Adjust the length and detail of this section accordingly to help achieve this target.`
+  }
+  
   // Add custom prompt/instructions if provided
   if (context.customPrompt) {
     basePrompt += `\n\nAdditional Instructions:\n${context.customPrompt}`

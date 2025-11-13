@@ -44,6 +44,8 @@ export default function DocumentEditor({ documentId }: DocumentEditorProps) {
   const [caseInfo, setCaseInfo] = useState<any>({})
   const [customPrompt, setCustomPrompt] = useState('')
   const [showAdvanced, setShowAdvanced] = useState(false)
+  const [enablePageCount, setEnablePageCount] = useState(false)
+  const [targetPageCount, setTargetPageCount] = useState<number>(5)
   const [showVersionHistory, setShowVersionHistory] = useState(false)
   const [supportingDocs, setSupportingDocs] = useState<File[]>([])
   const [currentVersion, setCurrentVersion] = useState(0)
@@ -332,17 +334,9 @@ export default function DocumentEditor({ documentId }: DocumentEditorProps) {
       const templateSectionTypes: string[] = document.template?.sections || defaultSectionTypes
       const context = buildGenerationContext()
 
-      // Filter sections that need generation
-      const sectionsToGenerate = templateSectionTypes.filter((sectionType) => {
-        const existingSection = document.sections.find((s) => s.sectionType === sectionType)
-        return !existingSection || !existingSection.content.trim()
-      })
-
+      // Always generate all sections (regenerate everything)
+      const sectionsToGenerate = templateSectionTypes
       const totalSections = sectionsToGenerate.length
-      if (totalSections === 0) {
-        alert('All sections already have content!')
-        return
-      }
 
       // Generate all sections sequentially with progress tracking
       for (let i = 0; i < sectionsToGenerate.length; i++) {
@@ -434,6 +428,7 @@ export default function DocumentEditor({ documentId }: DocumentEditorProps) {
       selectedProviders: document?.metadata?.selectedProviders || [],
       selectedTranscriptions: document?.metadata?.selectedTranscriptions || [],
       copyStyle: document?.metadata?.styleSettings?.copyStyle || false,
+      targetPageCount: enablePageCount ? targetPageCount : undefined,
       matchTone: document?.metadata?.styleSettings?.matchTone || false,
       styleMetadata: document?.metadata?.styleMetadata,
       toneMetadata: document?.metadata?.toneMetadata,
@@ -620,7 +615,7 @@ export default function DocumentEditor({ documentId }: DocumentEditorProps) {
     )
   }
 
-  const existingSections = document.sections.sort((a, b) => a.order - b.order)
+  const existingSections = (document.sections || []).sort((a, b) => a.order - b.order)
   
   const defaultSectionTypes = [
     'introduction',
@@ -721,9 +716,9 @@ export default function DocumentEditor({ documentId }: DocumentEditorProps) {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 flex justify-center items-start">
           {/* Document Container - White page on black background */}
-          <div className="bg-white shadow-2xl min-h-[800px] p-12">
+          <div className="bg-white shadow-2xl min-h-[800px] p-12 w-full max-w-[8.5in]">
           {/* Document Header */}
           <div className="mb-8 border-b pb-6">
             <h1 className="text-2xl font-bold underline mb-4 text-black">
@@ -798,8 +793,43 @@ export default function DocumentEditor({ documentId }: DocumentEditorProps) {
         {/* Right Sidebar - Custom Prompts, Supporting Docs, Advanced Settings */}
         <div className="w-80 flex-shrink-0">
           <div className="sticky top-20 space-y-4">
-          {/* Custom Prompts */}
+          {/* DemandsAI Generation */}
           <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
+            <label className="block text-white text-sm font-medium mb-3">
+              DemandsAI Generation
+            </label>
+            
+            {/* Page Count Setting */}
+            <div className="mb-4">
+              <label className="flex items-center gap-2 text-white text-sm font-medium mb-2">
+                <input
+                  type="checkbox"
+                  checked={enablePageCount}
+                  onChange={(e) => setEnablePageCount(e.target.checked)}
+                  className="w-4 h-4 text-forest-500 bg-gray-800 border-gray-700 rounded focus:ring-forest-500"
+                />
+                <span>Specify Target Page Count</span>
+              </label>
+              {enablePageCount && (
+                <div className="mt-2">
+                  <input
+                    type="number"
+                    min="1"
+                    max="50"
+                    value={targetPageCount}
+                    onChange={(e) => setTargetPageCount(parseInt(e.target.value) || 5)}
+                    className="w-full px-3 py-2 bg-gray-800 text-white border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-forest-500 text-sm"
+                    placeholder="Number of pages"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">
+                    Target total page count for the entire demand letter
+                  </p>
+                </div>
+              )}
+            </div>
+            
+            {/* Custom Instructions */}
+            <div>
             <label className="block text-white text-sm font-medium mb-2">
               Custom Instructions
             </label>
@@ -827,6 +857,7 @@ export default function DocumentEditor({ documentId }: DocumentEditorProps) {
                 <span>Send</span>
                 <span className="text-xs opacity-75">(Ctrl+Enter)</span>
               </button>
+            </div>
             </div>
           </div>
 
@@ -898,7 +929,6 @@ export default function DocumentEditor({ documentId }: DocumentEditorProps) {
                     Defaults to current date
                   </p>
                 </div>
-                {/* Add more advanced settings here */}
               </div>
             )}
           </div>

@@ -41,7 +41,7 @@ npm run db:migrate
 npm run dev
 ```
 
-The server will start on port 3003. Open [http://localhost:3003](http://localhost:3003) in your browser.
+The server will start on port 3000. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### Quick Setup Script
 

@@ -1,0 +1,236 @@
+# Cursor Rules - Security and Secret Protection
+
+## 🚨 CRITICAL: NEVER Commit Secrets, API Keys, or Sensitive Information
+
+### NEVER Commit These Files:
+- `.env` files (any variation: `.env`, `.env.local`, `.env.production`, `.env.backup`, etc.)
+- Files containing `*.env*` in the name
+- Any file with credentials, secrets, or API keys
+- Configuration files with real credentials (use `.env.example` or placeholders instead)
+
+### NEVER Commit These Types of Information:
+
+#### API Keys and Tokens:
+- OpenRouter API keys (format: `sk-or-v1-...`)
+- OpenAI API keys (format: `sk-proj-...`, `sk-...`)
+- AWS Access Keys (format: `AKIA...`)
+- AWS Secret Access Keys
+- GitHub tokens
+- Any authentication tokens or API keys
+
+#### Database Credentials:
+- Database passwords
+- Database connection strings with real credentials
+- Database URLs with embedded passwords
+
+#### Authentication Secrets:
+- JWT secrets
+- Session secrets
+- OAuth client secrets
+- Private keys (`.pem`, `.key` files)
+
+#### Other Sensitive Data:
+- Passwords
+- Credit card numbers
+- Social security numbers
+- Personal identifiable information (PII)
+- Encryption keys
+
+### Always Use Placeholders in Code and Documentation:
+
+When creating files that will be committed to git, use placeholders:
+
+**✅ CORRECT:**
+```bash
+OPENROUTER_API_KEY=your-openrouter-api-key
+AWS_ACCESS_KEY_ID=your-aws-access-key-id
+DATABASE_URL=postgresql://user:password@host/database
+JWT_SECRET=your-secret-key-change-in-production
+```
+
+**❌ WRONG:**
+```bash
+OPENROUTER_API_KEY=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
+AWS_ACCESS_KEY_ID=AKIA6ELKOKYDIWJIBD7A
+DATABASE_URL=postgresql://user:realpassword@host/database
+```
+
+### Files That Should NEVER Contain Real Credentials:
+
+- **Documentation files** (`*.md`): Use placeholders only
+- **Configuration files** (`*.yaml`, `*.yml`, `*.json`): Use placeholders or environment variables
+- **Source code** (`*.ts`, `*.tsx`, `*.js`, `*.jsx`): Use `process.env.VARIABLE_NAME`
+- **Shell scripts** (`*.sh`): Use environment variables, never hardcode
+- **Deployment guides**: Show structure with placeholders
+
+### Before Creating or Modifying Files:
+
+1. **Check if the file will be committed to git**
+   - If yes, ensure it contains NO real credentials
+   - Use placeholders or environment variable references
+
+2. **For documentation files:**
+   - Always use placeholder values
+   - Add comments like: `# Replace with your actual API key`
+   - Show the structure, not the actual values
+
+3. **For code files:**
+   - Use `process.env.VARIABLE_NAME` for all secrets
+   - Never hardcode credentials
+   - Reference `.env` files in comments, but never include their contents
+
+4. **For configuration files:**
+   - Use environment variables
+   - Provide `.env.example` with placeholders
+   - Never commit actual `.env` files
+
+### Environment Variables Best Practices:
+
+- Real credentials belong **ONLY** in `.env` files
+- `.env` files must be in `.gitignore` (verify this)
+- Always use `process.env.VARIABLE_NAME` in code
+- Create `env.example` with placeholders for reference
+- Document required environment variables in README
+
+### Code Review Checklist:
+
+Before suggesting any commit, file creation, or code change:
+
+- [ ] No `.env` files are being committed
+- [ ] No API keys in code, documentation, or config files
+- [ ] No hardcoded passwords or secrets
+- [ ] All secrets use environment variables
+- [ ] Documentation uses placeholders only
+- [ ] Configuration files use placeholders or env vars
+- [ ] No sensitive data in any committed file
+
+### When User Asks to Commit:
+
+**ALWAYS check:**
+1. Are there any `.env` files in the commit?
+2. Are there any API keys visible in the diff?
+3. Are there any hardcoded secrets?
+4. If yes to any, **STOP** and warn the user
+
+### Example Warnings to Give:
+
+If you detect a secret being committed:
+```
+⚠️ WARNING: This file contains an API key/secret that should not be committed.
+Please:
+1. Remove the real credential
+2. Replace with a placeholder (e.g., "your-api-key-here")
+3. Ensure the real value is only in .env (which is gitignored)
+```
+
+### Remember:
+
+- **Real credentials = `.env` file only (gitignored)**
+- **Documentation/Examples = Placeholders only**
+- **Code = Environment variables only**
+- **When in doubt, use a placeholder**
+
+---
+
+## Memory Bank System
+
+### Overview
+
+The Memory Bank is a semi-permanent context storage system that provides long-term memory across chat sessions. It consists of 3 core markdown files in `/memory-bank/` that are automatically updated based on project changes.
+
+### Memory Bank Files
+
+1. **`memory-bank/project-brief.md`**: High-level project overview, tech stack, core features
+2. **`memory-bank/active-context.md`**: Current focus, active work, recent changes, next steps
+3. **`memory-bank/progress.md`**: Completed features, in-progress work, planned items, known issues
+
+### Auto-Update Behavior
+
+**ALWAYS** update memory bank files when making significant changes:
+
+#### Update `active-context.md` when:
+- Starting work on a new feature or area
+- Switching context between different parts of the codebase
+- Completing a significant task or feature
+- Making important architectural decisions
+- Encountering or resolving blockers
+- User explicitly requests context update
+
+#### Update `progress.md` when:
+- Completing a feature or PRD
+- Starting new work (move to "In Progress")
+- Identifying new issues or technical debt
+- Planning new features (add to "Planned")
+
+#### Update `project-brief.md` when:
+- Adding major new features
+- Changing technology stack
+- Significant architectural changes
+- Project scope changes
+
+### Memory Bank Update Process
+
+1. **Read current file** to understand existing state
+2. **Update relevant sections** with new information
+3. **Update "Last Updated" timestamp** to current date
+4. **Keep content concise** - high-level summaries, not exhaustive details
+5. **Remove outdated information** when updating
+
+### Context Loading
+
+**At the start of every conversation:**
+1. Read `memory-bank/active-context.md` to understand current focus
+2. Read `memory-bank/project-brief.md` for project overview (if needed)
+3. Reference `memory-bank/progress.md` for status (if needed)
+
+This provides immediate context without needing the user to re-explain the project state.
+
+### Update Triggers
+
+**Automatic triggers** (update without being asked):
+- Creating new major features or components
+- Completing PRDs or significant features
+- Making architectural decisions
+- Starting work on a new area
+- Resolving blockers or issues
+
+**Manual triggers** (when user requests):
+- "Update memory bank"
+- "Refresh active context"
+- "Update progress"
+
+### Memory Bank File Standards
+
+- **Be Concise**: High-level summaries, not detailed documentation
+- **Be Current**: Remove outdated information when updating
+- **Be Accurate**: Reflect actual codebase state
+- **Use Timestamps**: Always update "Last Updated" date
+- **Link References**: Link to relevant PRDs or code files when helpful
+
+### Example Update
+
+When completing a feature:
+1. Read `memory-bank/progress.md`
+2. Move feature from "In Progress" to "Completed"
+3. Update `active-context.md`:
+   - Remove completed work from "Active Work"
+   - Add to "Recent Changes"
+   - Update "Current Focus" if switching to new work
+4. Update timestamps
+
+### Memory Bank vs. Other Documentation
+
+- **Memory Bank**: Living context for LLM, auto-updated, concise
+- **PRDs**: Detailed feature specifications (static)
+- **README**: Setup and usage instructions (static)
+- **Code Comments**: Implementation details (in code)
+
+Memory bank files are **not** exhaustive documentation - they're context summaries optimized for LLM understanding.
+
+### Remember
+
+- **Memory bank = Living context, auto-updated**
+- **Always update when context changes significantly**
+- **Keep it concise and current**
+- **Reference at conversation start for context**
+

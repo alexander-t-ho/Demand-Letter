@@ -21,6 +21,7 @@ export interface GenerationContext {
     damages?: Array<{id: string, text: string, amount?: number, type: string}>
   }
   analysisId?: string
+  targetPageCount?: number
 }
 
 export interface GenerationRequest {
