@@ -50,7 +50,7 @@ JWT_SECRET=your-secret-key-change-in-production
 
 **❌ WRONG:**
 ```bash
-OPENROUTER_API_KEY=sk-or-v1-EXAMPLE-REPLACE-WITH-YOUR-ACTUAL-KEY-DO-NOT-COMMIT-REAL-KEYS
+OPENROUTER_API_KEY=replace-with-your-actual-openrouter-api-key
 AWS_ACCESS_KEY_ID=AKIAEXAMPLE123456789
 DATABASE_URL=postgresql://user:realpassword@host/database
 ```
