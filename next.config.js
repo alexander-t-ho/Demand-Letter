@@ -8,11 +8,17 @@ const nextConfig = {
     },
   },
   // Explicitly configure webpack for path resolution
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@': path.resolve(__dirname),
-    };
+  webpack: (config, { isServer }) => {
+    // Ensure resolve exists
+    if (!config.resolve) {
+      config.resolve = {};
+    }
+    // Ensure alias exists
+    if (!config.resolve.alias) {
+      config.resolve.alias = {};
+    }
+    // Add @ alias pointing to project root
+    config.resolve.alias['@'] = path.resolve(__dirname);
     return config;
   },
 }
