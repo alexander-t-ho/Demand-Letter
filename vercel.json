@@ -1,0 +1,11 @@
+{
+  "buildCommand": "npm ci --include=dev && npx prisma generate && npx next build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "regions": ["iad1"],
+  "env": {
+    "NEXT_PUBLIC_API_URL": "@render-backend-url"
+  }
+}
+

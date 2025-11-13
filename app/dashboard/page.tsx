@@ -31,7 +31,8 @@ export default function DashboardPage() {
 
   useEffect(() => {
     // Verify authentication first
-    fetch('/api/auth/verify')
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || ''
+    fetch(`${apiUrl}/api/auth/verify`)
       .then((res) => res.json())
       .then((data) => {
         if (!data.valid) {
@@ -48,9 +49,10 @@ export default function DashboardPage() {
   const loadData = async () => {
     try {
       setLoading(true)
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || ''
       const [docsResponse, templatesResponse] = await Promise.all([
-        fetch('/api/documents?limit=10'),
-        fetch('/api/templates'),
+        fetch(`${apiUrl}/api/documents?limit=10`),
+        fetch(`${apiUrl}/api/templates`),
       ])
 
       if (docsResponse.ok) {
@@ -71,8 +73,10 @@ export default function DashboardPage() {
   }
 
   const handleDelete = async (id: string) => {
-    const response = await fetch(`/api/documents/${id}`, {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || ''
+    const response = await fetch(`${apiUrl}/api/documents/${id}`, {
       method: 'DELETE',
+      credentials: 'include',
     })
 
     if (!response.ok) {
@@ -81,7 +85,11 @@ export default function DashboardPage() {
   }
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' })
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || ''
+    await fetch(`${apiUrl}/api/auth/logout`, { 
+      method: 'POST',
+      credentials: 'include',
+    })
     router.push('/login')
     router.refresh()
   }

@@ -17,7 +17,10 @@ services:
         generateValue: true
       - key: NEXTAUTH_URL
         sync: false
-        value: https://demand-letter-generator.onrender.com
+        value: https://demand-letter-szag.onrender.com
+      - key: NEXT_PUBLIC_FRONTEND_URL
+        sync: false
+        value: https://your-vercel-app.vercel.app
       # Add these in Render dashboard:
       # AWS_ACCESS_KEY_ID
       # AWS_SECRET_ACCESS_KEY
