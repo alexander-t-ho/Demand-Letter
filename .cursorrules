@@ -104,13 +104,29 @@ Before suggesting any commit, file creation, or code change:
 - [ ] Configuration files use placeholders or env vars
 - [ ] No sensitive data in any committed file
 
-### When User Asks to Commit:
+### Git Commands Policy:
 
-**ALWAYS check:**
-1. Are there any `.env` files in the commit?
-2. Are there any API keys visible in the diff?
-3. Are there any hardcoded secrets?
-4. If yes to any, **STOP** and warn the user
+**NEVER run git commands automatically. Git commands are NOT in the allowlist.**
+
+**DO NOT run these commands without explicit user request:**
+- `git add`
+- `git commit`
+- `git push`
+- `git pull`
+- `git merge`
+- `git branch`
+- `git checkout`
+- `git reset`
+- Any other git commands
+
+**When user explicitly requests git operations:**
+1. **ALWAYS check for sensitive data first:**
+   - Are there any `.env` files in the commit?
+   - Are there any API keys visible in the diff?
+   - Are there any hardcoded secrets?
+2. If sensitive data is found, **STOP** and warn the user
+3. **Show the user what will be committed** before executing
+4. **Wait for explicit confirmation** before running any git command
 
 ### Example Warnings to Give:
 
