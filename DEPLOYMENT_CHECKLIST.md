@@ -61,10 +61,6 @@ AWS_SECRET_ACCESS_KEY=<your-aws-secret-key>
 AWS_REGION=us-east-1
 AWS_S3_BUCKET=alexho-demand-letters
 
-# OpenRouter AI
-OPENROUTER_API_KEY=<your-openrouter-api-key>
-OPENROUTER_DEFAULT_MODEL=anthropic/claude-3.5-sonnet
-
 # Node Environment
 NODE_ENV=production
 ```
@@ -83,11 +79,7 @@ NODE_ENV=production
    - Get from AWS IAM console
    - Ensure S3 bucket exists: `alexho-demand-letters`
 
-4. **OPENROUTER_API_KEY**: 
-   - Get from https://openrouter.ai/keys
-   - Format: `sk-or-v1-...`
-
-5. **NEXTAUTH_URL**: 
+4. **NEXTAUTH_URL**: 
    - Update after deployment with your actual Render URL
    - Format: `https://your-app-name.onrender.com`
 
@@ -122,7 +114,6 @@ npm run seed:templates
 - [ ] Environment variables are set correctly
 - [ ] Login functionality works
 - [ ] File uploads work (if using S3)
-- [ ] AI generation works (if using OpenRouter)
 
 ## Troubleshooting
 

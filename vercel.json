@@ -1,0 +1,7 @@
+{
+  "name": "demand-letter-generator",
+  "version": 2,
+  "buildCommand": "npm install && npx prisma generate && npm run build",
+  "framework": "nextjs"
+}
+

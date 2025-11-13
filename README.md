@@ -9,7 +9,6 @@ AI-powered demand letter generation tool built with Next.js 14+, Prisma, and Pos
 - Node.js 18+ 
 - PostgreSQL database (Vercel Postgres, Supabase, or local)
 - AWS account (for S3 storage)
-- OpenRouter API key
 
 ### Installation
 
@@ -140,7 +139,6 @@ Required environment variables (see `.env.example`):
 - `AWS_ACCESS_KEY_ID` - AWS access key
 - `AWS_SECRET_ACCESS_KEY` - AWS secret key
 - `AWS_S3_BUCKET` - S3 bucket name (with alexho- prefix)
-- `OPENROUTER_API_KEY` - OpenRouter API key
 
 ## Development
 
